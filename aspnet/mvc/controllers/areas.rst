@@ -1,31 +1,33 @@
 Areas
 ======
 
-作者：`Dhananjay Kumar <https://twitter.com/debug_mode>`__  and `Rick Anderson`_
+原文：`Areas <https://docs.asp.net/en/latest/mvc/controllers/areas.html>`_
 
-翻译：`耿晓亮(Blue)`
+作者：`Dhananjay Kumar <https://twitter.com/debug_mode>`_  和 `Rick Anderson`_
 
-Areas 提供了一种分离大型 MVC 应用程序的 models ,views 和 controllers 语义相关分组的方式，让我们看一个示例来说明 Areas 如何创建和使用。假设你有一个存储程序包含了两个不同分组的 controllers 和 views ：Products 和 Services。
+翻译：`耿晓亮(Blue) <https://github.com/heyixiaoran>`_
 
-替换 Controllers 文件夹下所有的 controllers 和 Views 文件夹下所有的 views，你可以使用 Areas 将视图和控制器根据关联的领域来分组（或者用逻辑分组）。
+校对：`许登洋(Seay) <https://github.com/SeayXu>`_
 
-reas provide a way to partition a large ASP.NET Core MVC Web app into smaller functional groupings. An area is effectively an MVC structure inside an application. In an MVC project, logical components like Model, Controller, and View are kept in different folders, and MVC uses naming conventions to create the relationship between these components. For a large app, it may be advantageous to partition the  app into separate high level areas of functionality. For instance, an e-commerce app with multiple business units, such as checkout, billing, and search etc. Each of these units have their own logical component views, controllers, and models. In this scenario, you can use Areas to physically partition the business components in the same project.
+Areas 是 ASP.NET MVC 用来将相关功能组织成一组单独命名空间（路由）和文件夹结构（视图）的功能。使用 Areas 创建层次结构的路由，是通过添加另一个路由参数 ``area`` 到 ``Controller`` 和 ``action``。
 
-An area can be defined as smaller functional units in an ASP.NET Core MVC project with its own set of controllers, views, and models.
+Areas 提供了一种把大型 ASP.NET Core MVC Web 应用程序分为较小的功能分组的方法。Area 是应用程序内部一个有效的 MVC 结构。在 MVC 项目中，像 Model，Controller 和 View 的逻辑组件放在不同的文件夹中，MVC 用命名约定来创建这些组件间的关系。对于大型应用，它有利于把应用分割成独立高级功能的 Areas。例如，一个多业务单元的电子商务应用，如结账，计费和搜索等。每个单元都有自己的逻辑组件：视图、控制器和模型。在这种情况下，你可以用 Areas 在同一项目中物理分割业务组件。
 
-Consider using Areas in an MVC project when:
+在 ASP.NET Core MVC 项目中 Area 被定义成有自己的一套 controller，view 和 model 的较小的功能单元。
 
-- Your application is made of multiple high-level functional components that should be logically separated
-- You want to partition your MVC project so that each functional area can be worked on independently
+当有下列情况时应当考虑在 MVC 项目中用 Areas：
 
-Area features:
+- 你的应用程序应该从逻辑上分隔成多个高级功能组件的
+- 你想要分隔你的 MVC 项目，使每一个功能 area 可以独立工作
 
-- An ASP.NET Core MVC app can have any number of areas
-- Each area has its own controllers, models, and views
-- Allows you to organize large MVC projects into multiple high-level components that can be worked on independently
-- Supports multiple controllers with the same name - as long as they have different *areas*
+Area 特性：
 
-Let's take a look at an example to illustrate how Areas are created and used. Let's say you have a store app that has two distinct groupings of controllers and views: Products and Services. A typical folder structure for that using MVC areas looks like below:
+- 一个 ASP.NET Core MVC 应用可以有任意数量的 area
+- 每一个 area 都有自己的控制器、模型和视图
+- 允许把大型 MVC 项目组织成多个高级组件以便可以独立工作
+- 支持具有相同名称的多个控制器 - 只要它们有不同的 `areas`
+
+让我们看一个例子，说明如何创建和使用 Areas。比如在一个商店应用程序里有两个不同分组的控制器和视图：Products 和 Services。下一个典型的文件夹结构，使用 MVC Area 看起来像下面：
 
 - Project name
 
@@ -61,19 +63,31 @@ Let's take a look at an example to illustrate how Areas are created and used. Le
 
           - Index.cshtml
 
-查看上边的目录层次结构的示例，在定义 areas 时要坚持几条准则：
+当 MVC 尝试在 Area 中渲染一个视图时，默认情况下，会尝试在下面位置中查找：
 
-- Areas 目录必须作为项目的子目录存在。
-- 项目的每一个 Areas 都包含 Areas 子目录(示例中的 Products 和 Services)。
-- controllers 应该在像下面的位置： ``/Areas/[area]/Controllers/[controller].cs``
-- views 应该在像下面的位置： ``/Areas/[area]/Views/[controller]/[action].cshtml``
+.. code-block:: text
 
-注意，如果你有一个跨 controllers 分享的 view ，它可以在下边任何一个位置：
+  /Areas/<Area-Name>/Views/<Controller-Name>/<Action-Name>.cshtml
+  /Areas/<Area-Name>/Views/Shared/<Action-Name>.cshtml
+  /Views/Shared/<Action-Name>.cshtml
 
-- ``/Areas/[area]/Views/Shared/[action].cshtml``
-- ``/Views/Shared/[action].cshtml``
+这些默认的位置可以通过 ``Microsoft.AspNetCore.Mvc.Razor.RazorViewEngineOptions`` 的 ``AreaViewLocationFormats`` 方法被修改。
 
-一旦你定义了文件夹的层次结构，你需要告诉 MVC 每一个控制器相关的 areas。用 ``[Area]`` 特性修饰控制器名称。
+例如，在下面的代码中文件夹名为 'Areas'，它被修改为 'Categories'。
+
+.. code-block:: c#
+
+  services.Configure<RazorViewEngineOptions>(options =>
+  {
+      options.AreaViewLocationFormats.Clear();
+      options.AreaViewLocationFormats.Add("/Categories/{2}/Views/{1}/{0}.cshtml");
+      options.AreaViewLocationFormats.Add("/Categories/{2}/Views/Shared/{0}.cshtml");
+      options.AreaViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+  });
+
+需要注意的是 Views 文件夹结构是唯一需要重点考虑的并且剩余文件夹像 Controllers 和 Models 的内容并不重要。比如，根本不需要 Controllers 和 Models 文件夹。这是因为 Controllers 和 Models 的内容只是编译成一个 .dll 的代码不是作为 Views 的内容直到 view 被请求。 
+
+一旦定义了文件夹层次结构，需要告诉 MVC 每一个相关的 area 的 controller。用 ``[Area]`` 特性修饰控制器名称。
 
 .. code-block:: c#
   :emphasize-lines: 4
@@ -84,15 +98,21 @@ Let's take a look at an example to illustrate how Areas are created and used. Le
       [Area("Products")]
       public class HomeController : Controller
       {
-          // GET: /<controller>/
+          // GET: /Products/Home/Index
           public IActionResult Index()
+          {
+              return View();
+          }
+
+          // GET: /Products/Home/Create
+          public IActionResult Create()
           {
               return View();
           }
       }
   }
 
-最后一步是建立一个基于新创建的 areas 的路由定义。 :doc:`routing` 详细介绍了如何创建路由定义, 包括使用传统路由与特性路由。在本例中，我们会用传统路由。想这样做, 只需打开 *Startup.cs* 文件并修改添加下边高亮的路由定义。
+用新创建的 areas 设置一个路由的定义。:doc:`routing` 详细介绍了如何创建路由定义, 包括使用传统路由与特性路由。在本例中，我们会用传统路由。想这样做, 只需打开 `Startup.cs` 文件并通过添加下边高亮的路由定义修改它。
 
 .. code-block:: c#
   :emphasize-lines: 4-6
@@ -108,25 +128,59 @@ Let's take a look at an example to illustrate how Areas are created and used. Le
         template: "{controller=Home}/{action=Index}");
   });
 
-现在，当用浏览器转到 *http://<yourApp>/products*, ``Products`` area 中 ``HomeController`` 文件的 ``Index`` 操作方法就会被调用。
+浏览 `http://<yourApp>/products`， ``Products`` area 中 ``HomeController`` 的 ``Index`` 方法将会被调用。
 
-Areas 之间的关联
+生成链接
 ---------------------
 
-想要 areas 之间关联, 只需要指定通过 :doc:`Tag Helpers </mvc/views/tag-helpers/index>` 定义的 controller 的 area。
+- 从一个基础 controller 的 area 中的方法生成链接到同一 controller 的另一个方法。
 
-下面的代码段演示了在叫做 *Products* area 中如何连接到一个控制器操作。
+  当前请求路径像 ``/Products/Home/Create``
+
+  HtmlHelper 语法：``@Html.ActionLink("Go to Product's Home Page", "Index")``
+
+  TagHelper 语法：``<a asp-action="Index">Go to Product's Home Page</a>``
+
+  注意这里不需要提供 'area' 和 'controller' 值因为他们在当前请求上下文中已经可用。这种值被称作 ``ambient`` 值。
+
+- 从一个基础 controller 的 area 中的方法生成链接到不同 controller 的另一个方法。
+
+  当前请求路径像 ``/Products/Home/Create``
+
+  HtmlHelper 语法：``@Html.ActionLink("Go to Manage Products’ Home Page", "Index", "Manage")``
+
+  TagHelper 语法：``<a asp-controller="Manage" asp-action="Index">Go to Manage Products’ Home Page</a>``
+
+  注意这里用的 'area' 环境值是上面 'controller' 明确指定的。
+
+- 从一个基础 controller 的 area 中的方法生成链接到不同 controller 和不同 area 另一个方法。
+
+  当前请求路径像 ``/Products/Home/Create``
+
+  HtmlHelper 语法：``@Html.ActionLink("Go to Services’ Home Page", "Index", "Home", new { area = "Services" })``
+
+  TagHelper 语法：``<a asp-area="Services" asp-controller="Home" asp-action="Index">Go to Services’ Home Page</a>``
+
+  注意这里没有环境值被用。
+
+- 从一个基础 controller 的 area 中的方法生成链接到不在一个 area 中的不同 controller 的另一个方法。
+
+  HtmlHelper 语法：``@Html.ActionLink("Go to Manage Products’ Home Page", "Index", "Home", new { area = "" })``
+
+  TagHelper 语法：``<a asp-area="" asp-controller="Manage" asp-action="Index">Go to Manage Products’ Home Page</a>``
+
+  因此生成链接到非 area 的基础 controller 方法，清空了这里 'area' 的环境值。
+
+发布 Areas
+---------------------
+
+发布 areas 文件夹的所有 view，在 project.json 包含一个条目在 ``publishOptions`` 的 ``include`` 节点如下：
 
 .. code-block:: c#
 
-  @Html.ActionLink("See Products Home Page", "Index", "Home", new { area = "Products" }, null)
-
-关联到一个不是 area 部分的控制器操作，只需要移除 ``asp-route-area`` 
-
-.. code-block:: c#
-
-  @Html.ActionLink("Go to Home Page", "Index", "Home", new { area = "" }, null)
-
-总结
--------
-Areas 是一个非常有用的用于分组语义相关的 controllers 和共同父文件夹下的 actions 的工具。通过本文, 你学习了如何设置用于 ``Areas`` 文件夹层次结构, 如何指定 ``[Area]`` 特性表示归属指定的 area 的 controller，和如何用 areas 定义路由。
+  "publishOptions": {
+  "include": [
+    "Areas/**/*.cshtml",
+    ....
+    ....
+  ]
