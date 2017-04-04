@@ -8,7 +8,7 @@ manager: wpickett
 ms.date: 02/11/2017
 ms.topic: article
 ms.assetid: 0292bdae-b3ed-4637-bd67-19b9bb8b65cb
-ms.prod: aspnet-core
+ms.prod: asp.net-core
 uid: security/key-vault-configuration
 ---
 # Azure Key Vault configuration provider
@@ -139,6 +139,9 @@ When the application fails to load configuration using the provider, an error me
 * The app has the wrong key vault name (`Vault`), Azure AD App Id (`ClientId`), or Azure AD Key (`ClientSecret`).
 * The Azure AD Key (`ClientSecret`) is expired.
 * The configuration key (name) is incorrect in the app for the value you're trying to load.
+
+`System.TypeLoadException` exception during startup using `.NET 4.6.x`:
+* Add a NuGet reference to the package for `System.Net.Http` version 4.3.1 or later.
 
 ## Additional resources
 * <xref:fundamentals/configuration>

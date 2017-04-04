@@ -1,100 +1,63 @@
 ---
 title: Two-factor authentication with SMS | Microsoft Docs
 author: rick-anderson
-description: 
-keywords: ASP.NET Core,
+description: Shows how to set up two-factor authentication (2FA) with ASP.NET Core
+keywords: ASP.NET Core, SMS, authentication, 2FA, two-factor authentication, two factor authentication 
 ms.author: riande
 manager: wpickett
-ms.date: 10/14/2016
+ms.date: 04/01/2017
 ms.topic: article
 ms.assetid: ff1c22d1-d1f2-4616-84dd-94ba61ec299a
 ms.technology: aspnet
-ms.prod: aspnet-core
+ms.prod: asp.net-core
 uid: security/authentication/2fa
 ---
 # Two-factor authentication with SMS
 
->[!WARNING]
-> This page documents version 1.0.0-beta8 and has not yet been updated for version 1.0.0
-
-<a name=security-authentication-2fa></a>
-
 By [Rick Anderson](https://twitter.com/RickAndMSFT)
 
-This tutorial will show you how to set up two-factor authentication (2FA) using SMS. Twilio is used, but you can use any other SMS provider. We recommend you complete [Account Confirmation and Password Recovery](accconfirm.md) before starting this tutorial.
+This tutorial will show you how to set up two-factor authentication (2FA) using SMS. [twilio](https://www.twilio.com/) is used, but you can use any other SMS provider. We recommend you complete [Account Confirmation and Password Recovery](accconfirm.md) before starting this tutorial.
 
 ## Create a new ASP.NET Core project
 
-Create a new ASP.NET Core web app with individual user accounts.
+Create a new ASP.NET Core web app with individual user accounts. Follow the instructions in [Enforcing SSL in an ASP.NET Core app](xref:security/enforcing-ssl) to set up and require SSL.
 
-![Visual Studio New Project dialog](accconfirm/_static/new-project.png)
+### Create an SMS account
 
-After you create the project, follow the instructions in [Account Confirmation and Password Recovery](accconfirm.md) to set up and require SSL.
+Create an SMS account, for example, from [twilio](https://www.twilio.com/try-twilio). Record the authentication credentials.
 
-## Setup up SMS for two-factor authentication with Twilio
+### Provide for the SMS tokens
 
-* Create a [Twilio](http://www.twilio.com/) account.
+We'll use the [Options pattern](xref:fundamentals/configuration#options-config-objects) to access the user account and key settings. 
 
-* On the **Dashboard** tab of your Twilio account, note the **Account SID** and **Authentication token**. Note: Tap **Show API Credentials** to see the Authentication token.
+   * Create a class to fetch the secure SMS key. For this sample, the `SMSoptions` class is created in the *Services/SMSoptions.cs* file.
 
-* On the **Numbers** tab, note the Twilio phone number.
+[!code-csharp[Main](2fa/sample/Web2FA/Services/SMSoptions.cs)]
 
-* Install the Twilio NuGet package. From the Package Manager Console (PMC),  enter the following the following command:
+Set the `accountSid` and `authToken` with the [secret-manager tool](xref:security/app-secrets). For example:
 
-   <!-- literal_block {"ids": [], "xml:space": "preserve"} -->
+```none
+C:/Web2FA/src/WebApp1>dotnet user-secrets set accountSid 12345
+info: Successfully saved accountSid = 12345 to the secret store.
+```
 
-   ```
-   Install-Package Twilio
-   ```
+* Add the twilio NuGet package. From the Package Manager Console (PMC) run
+
+`Install-Package Twilio`
 
 * Add code in the *Services/MessageServices.cs* file to enable SMS.
 
-[!code-csharp[Main](2fa/sample/WebSMS/src/WebSMS/Services/MessageServices.cs?range=12-39)]
+[!code-csharp[Main](2fa/sample/Web2FA/Services/MessageServices.cs)]
 
-> [!NOTE]
-> Twilio does not yet support [.NET Core](https://microsoft.com/net/core). To use Twilio from your application you need to either target the full .NET Framework or you can call the Twilio REST API to send SMS messages.
+### Configure startup to use `SMSoptions`
 
-> [!NOTE]
-> You can remove `//` line comment characters from the `System.Diagnostics.Debug.WriteLine(message);` line to test the application when you can't get SMS messages. A better approach is to use the built in [logging system](../../fundamentals/logging.md).
+Add `SMSoptions` to the service container in the `ConfigureServices` method in the *Startup.cs*:
 
-### Configure the SMS provider key/value
+[!code-csharp[Main](2fa/sample/Web2FA/Startup.cs?name=snippet1&highlight=4)]
 
-We'll use the [Options pattern](../../fundamentals/configuration.md#options-config-objects) to access the user account and key settings. For more information, see [configuration](../../fundamentals/configuration.md#fundamentals-configuration).
+### Enable two-factor authentication
 
-   * Create a class to fetch the secure SMS key. For this sample, the `AuthMessageSMSSenderOptions` class is created in the *Services/AuthMessageSMSSenderOptions.cs* file.
-
-[!code-csharp[Main](2fa/sample/WebSMS/src/WebSMS/Services/AuthMessageSMSSenderOptions.cs?range=3-8)]
-
-Set `SID`, `AuthToken`, and `SendNumber` with the [secret-manager tool](../app-secrets.md). For example:
-
-```none
-C:/WebSMS/src/WebApplication1>dotnet user-secrets set SID abcdefghi
-info: Successfully saved SID = abcdefghi to the secret store.
-```
-
-### Configure startup to use `AuthMessageSMSSenderOptions`
-
-Add `AuthMessageSMSSenderOptions` to the service container at the end of the `ConfigureServices` method in the *Startup.cs* file:
-
-[!code-csharp[Main](./2fa/sample/WebSMS/src/WebSMS/Startup.cs?highlight=4&range=73-77)]
-
-## Enable two-factor authentication
-
-*  Open the *Views/Manage/Index.cshtml* Razor view file.
-
-*  Uncomment the phone number markup which starts at
-
-    `@*@(Model.PhoneNumber ?? "None")`
-
-*  Uncomment the `Model.TwoFactor` markup which starts at
-
-    `@*@if (Model.TwoFactor)`
-
-* Comment out or remove the `<p>There are no two-factor authentication providers configured.` markup.
-
-    The completed code is shown below:
-
-[!code-html[Main](2fa/sample/WebSMS/src/WebSMS/Views/Manage/Index.cshtml?range=32-77)]
+Open the *Views/Manage/Index.cshtml* Razor view file and remove the comment characters (so no markup is commnted out).
 
 ## Log in with two-factor authentication
 
@@ -114,7 +77,7 @@ Add `AuthMessageSMSSenderOptions` to the service container at the end of the `Co
 
 ![Verify Phone Number page](2fa/_static/login2fa4.png)
 
-If you don't get a text message, see [Debugging Twilio](#debugging-twilio).
+If you don't get a text message, see twilio log page.
 
 * The Manage view shows your phone number was added successfully.
 
@@ -144,26 +107,4 @@ If you don't get a text message, see [Debugging Twilio](#debugging-twilio).
 
 We recommend you use account lockout with 2FA. Once a user logs in (through a local account or social account), each failed attempt at 2FA is stored, and if the maximum attempts (default is 5) is reached, the user is locked out for five minutes (you can set the lock out time with `DefaultAccountLockoutTimeSpan`). The following configures Account to be locked out for 10 minutes after 10 failed attempts.
 
-[!code-csharp[Main](./2fa/sample/WebSMS/src/WebSMS/Startup.cs?highlight=1,2,3,4,5&range=67-77)]
-
-## Debugging Twilio
-
-If you're able to use the Twilio API, but you don't get an SMS message, try the following:
-
-1.  Log in to the Twilio site and navigate to the **Logs** > **SMS & MMS Logs** page. You can verify that messages were sent and delivered.
-
-2.  Use the following code in a console application to test Twilio:
-
-    ```csharp
-    static void Main(string[] args)
-    {
-      string AccountSid = "";
-      string AuthToken = "";
-      var twilio = new Twilio.TwilioRestClient(AccountSid, AuthToken);
-      string FromPhone = "";
-      string toPhone = "";
-      var message = twilio.SendMessage(FromPhone, toPhone, "Twilio Test");
-      Console.WriteLine(message.Sid);
-    }
-    ```
-    
+[!code-csharp[Main](2fa/sample/Web2FA/Startup.cs?name=snippet2&highlight=13-17)] 

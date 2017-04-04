@@ -9,7 +9,7 @@ ms.date: 11/29/2016
 ms.topic: article
 ms.assetid: b3a5984d-e172-42eb-8a48-547e4acb6806
 ms.technology: aspnet
-ms.prod: aspnet-core
+ms.prod: asp.net-core
 uid: fundamentals/configuration
 ---
 <a name=fundamentals-configuration></a>
@@ -32,7 +32,7 @@ Each configuration value maps to a string key. There’s built-in binding suppor
 
 [View or download sample code](https://github.com/aspnet/docs/tree/master/aspnetcore/fundamentals/configuration/sample)
 
-  ## Simple configuration
+## Simple configuration
 
 The following console app uses the JSON configuration provider:
 
@@ -46,6 +46,12 @@ Configuration consists of a hierarchical list of name-value pairs in which the n
 
 ```csharp
 Console.WriteLine($"option1 = {Configuration["subsection:suboption1"]}");
+```
+
+To work with arrays in JSON-formatted configuration sources, use a zero-based array index as part of the colon-separated string used to retrieve the value. For instance, to get the name of the first item in the `wizards` array shown above, use the following code:
+
+```csharp
+Console.Write($"{Configuration["wizards:0:Name"]}, ");
 ```
 
 Name/value pairs written to the built in `Configuration` providers are **not** persisted, however, you can create a custom provider that saves values. See [custom configuration provider](xref:fundamentals/configuration#custom-config-providers).
@@ -164,9 +170,7 @@ The following sample shows how to use the in-memory provider and bind to a class
 
 [!code-csharp[Main](configuration/sample/src/InMemory/Program.cs)]
 
-[!code-csharp[Main](configuration/sample/src/InMemory/MyWindow.cs)]
-
-Configuration values are returned as strings, but binding enables the construction of objects. Bindling allows you to retrieve POCO objects or even entire object graphs. The following sample shows how to bind to the `MyWindow` class and use the options pattern with a ASP.NET Core MVC app:
+Configuration values are returned as strings, but binding enables the construction of objects. Binding allows you to retrieve POCO objects or even entire object graphs. The following sample shows how to bind to `MyWindow` and use the options pattern with a ASP.NET Core MVC app:
 
 [!code-csharp[Main](configuration/sample/src/WebConfigBind/MyWindow.cs)]
 
@@ -253,7 +257,7 @@ Add a `ConfigurationContext` to store and access the configured values:
 
 [!code-csharp[Main](configuration/sample/src/CustomConfigurationProvider/ConfigurationContext.cs?name=snippet1)]
 
-Create an class that inherits from [IConfigurationSource](https://docs.microsoft.com/en-us/aspnet/core/api/microsoft.extensions.configuration.iconfigurationsource):
+Create an class that implements [IConfigurationSource](https://docs.microsoft.com/en-us/aspnet/core/api/microsoft.extensions.configuration.iconfigurationsource):
 
 [!code-csharp[Main](configuration/sample/src/CustomConfigurationProvider/EntityFrameworkConfigurationSource.cs?highlight=7)]
 

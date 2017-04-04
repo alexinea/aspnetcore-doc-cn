@@ -1,18 +1,11 @@
-﻿# [Introduction](index.md)
+# [Introduction](index.md)
 
 # [Getting Started](getting-started.md)
-
-# [Tutorials](tutorials/index.md)
 ## [Your first ASP.NET Core application on a Mac using Visual Studio Code](tutorials/your-first-mac-aspnet.md)
 ## [Building your first ASP.NET Core MVC app with Visual Studio](tutorials/first-mvc-app/index.md)
-## [Building your first Web API with ASP.NET Core MVC using Visual Studio](tutorials/first-web-api.md)
-## [Getting started with ASP.NET Core and Entity Framework Core using Visual Studio](data/ef-mvc/index.md)
-## [Deploy an ASP.NET Core web app to Azure using Visual Studio](tutorials/publish-to-azure-webapp-using-vs.md)
-## [ASP.NET Core on Nano Server](tutorials/nano-server.md)
-## [ASP.NET Core and Azure Service Fabric](https://azure.microsoft.com/en-us/documentation/articles/service-fabric-add-a-web-frontend)
-## [Creating backend services for native mobile applications](mobile/native-mobile-backend.md)
 ## [Developing ASP.NET Core applications using dotnet watch](tutorials/dotnet-watch.md)
-## [ASP.NET Web API Help Pages using Swagger](tutorials/web-api-help-pages-using-swagger.md)
+
+# [Tutorials](tutorials/index.md)
 
 # [Fundamentals](fundamentals/index.md)
 ## [Application Startup](fundamentals/startup.md)
@@ -21,6 +14,7 @@
 ## [Routing](fundamentals/routing.md)
 ## [URL Rewriting Middleware](fundamentals/url-rewriting.md)
 ## [Error Handling](fundamentals/error-handling.md)
+## [WebSockets](fundamentals/websockets.md)
 ## [Globalization and localization](fundamentals/localization.md)
 ## [Configuration](fundamentals/configuration.md)
 ## [Logging](fundamentals/logging.md)
@@ -72,6 +66,7 @@
 ### [Testing controllers](mvc/controllers/testing.md)
 ## [Rendering HTML with views](mvc/views/overview.md)
 ### [Razor syntax](mvc/views/razor.md)
+### [View compilation](mvc/views/view-compilation.md)
 ### [Layout](mvc/views/layout.md)
 ### [🔧 HTML helpers](mvc/views/html-helpers.md)
 ### [Tag helpers](mvc/views/tag-helpers/intro.md)
@@ -127,6 +122,7 @@
 
 # [API Reference](/aspnet/core/api/)
 
-# [Release notes](https://github.com/aspnet/home/releases)
+# [What's new](aspnetcore-1.1.md)
+## [All release notes](https://github.com/aspnet/home/releases)
 
 # [Contribute](https://github.com/aspnet/Docs/blob/master/CONTRIBUTING.md)

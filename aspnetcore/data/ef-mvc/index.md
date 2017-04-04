@@ -5,16 +5,16 @@ description:
 keywords: ASP.NET Core,
 ms.author: tdykstra
 manager: wpickett
-ms.date: 10/14/2016
+ms.date: 03/15/2017
 ms.topic: article
 ms.assetid: 9918be4c-2096-404f-9b2a-ed5cde90042a
 ms.technology: aspnet
-ms.prod: aspnet-core
+ms.prod: asp.net-core
 uid: data/ef-mvc/index
 ---
 # Getting started with ASP.NET Core and Entity Framework Core using Visual Studio
 
-This series of tutorials teaches you how to create ASP.NET Core MVC web applications that use Entity Framework Core for data access. The tutorials require Visual Studio 2015.
+This series of tutorials teaches you how to create ASP.NET Core MVC web applications that use Entity Framework Core for data access. The tutorials require Visual Studio 2017.
 
 1. [Getting started](intro.md)
 2. [Create, Read, Update, and Delete operations](crud.md)

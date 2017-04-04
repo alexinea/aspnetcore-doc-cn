@@ -9,7 +9,7 @@ using System.IO;
 
 public class Program
 {
-    static public IConfigurationRoot Configuration { get; set; }
+    public static IConfigurationRoot Configuration { get; set; }
     public static void Main(string[] args = null)
     {
         var builder = new ConfigurationBuilder()
@@ -21,6 +21,13 @@ public class Program
         Console.WriteLine($"option1 = {Configuration["option1"]}");
         Console.WriteLine($"option2 = {Configuration["option2"]}");
         Console.WriteLine(
-            $"option1 = {Configuration["subsection:suboption1"]}");
+            $"suboption1 = {Configuration["subsection:suboption1"]}");
+        Console.WriteLine();
+
+        Console.WriteLine("Wizards:");
+        Console.Write($"{Configuration["wizards:0:Name"]}, ");
+        Console.WriteLine($"age {Configuration["wizards:0:Age"]}");
+        Console.Write($"{Configuration["wizards:1:Name"]}, ");
+        Console.WriteLine($"age {Configuration["wizards:1:Age"]}");
     }
 }
